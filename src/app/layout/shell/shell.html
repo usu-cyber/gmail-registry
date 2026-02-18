@@ -1,1 +1,13 @@
-<p>shell works!</p>
+<mat-sidenav-container class="h-screen bg-gray-50">
+    <mat-sidenav mode="side" opened class="w-64 bg-white border-r border-gray-200">
+        <app-sidebar />
+    </mat-sidenav>
+
+    <mat-sidenav-content class="flex h-screen flex-col">
+        <app-header />
+
+        <main class="flex-1 overflow-auto p-8">
+            <router-outlet />
+        </main>
+    </mat-sidenav-content>
+</mat-sidenav-container>

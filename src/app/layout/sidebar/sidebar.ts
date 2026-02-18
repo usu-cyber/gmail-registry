@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [],
-  templateUrl: './sidebar.html',
-  styleUrl: './sidebar.scss',
+  standalone: true,
+  imports: [RouterLink, RouterLinkActive, MatIconModule],
+  templateUrl: './sidebar.component.html',
 })
-export class Sidebar {
-
-}
+export class SidebarComponent { }
