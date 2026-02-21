@@ -1,4 +1,155 @@
-<div class="space-y-2">
-  <h1 class="text-2xl font-semibold text-gray-900">Sources</h1>
-  <p class="text-sm text-gray-600">ここに一覧・フィルタ・検索を置く。</p>
+<div class="space-y-6">
+  <!-- Title -->
+  <div class="flex items-end justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-900">Sources</h1>
+      <p class="mt-1 text-sm text-gray-600">
+        登録先候補を表示。フィルタして「調べる対象」を絞り込む。
+      </p>
+    </div>
+
+    <button
+      class="text-sm text-gray-600 hover:text-gray-900 underline"
+      (click)="clearFilters()"
+    >
+      Clear
+    </button>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="rounded-2xl border border-gray-200 bg-white p-4">
+    <div class="flex flex-wrap items-center gap-3">
+      <!-- Search -->
+      <div class="flex-1 min-w-[220px]">
+        <input
+          class="w-full rounded-xl border border-gray-200 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-200"
+          placeholder="Search: name / domain / email"
+          [value]="search()"
+          (input)="search.set(($any($event.target)).value)"
+        />
+      </div>
+
+      <!-- Category -->
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-gray-500">Category</span>
+        <div class="flex gap-1 rounded-xl bg-gray-50 p-1">
+          <button class="px-3 py-1.5 text-xs rounded-lg"
+            [class]="category()==='all' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600 hover:text-gray-900'"
+            (click)="setCategory('all')">All</button>
+          <button class="px-3 py-1.5 text-xs rounded-lg"
+            [class]="category()==='newsletter' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600 hover:text-gray-900'"
+            (click)="setCategory('newsletter')">Newsletter</button>
+          <button class="px-3 py-1.5 text-xs rounded-lg"
+            [class]="category()==='payment' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600 hover:text-gray-900'"
+            (click)="setCategory('payment')">Payment</button>
+          <button class="px-3 py-1.5 text-xs rounded-lg"
+            [class]="category()==='account' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600 hover:text-gray-900'"
+            (click)="setCategory('account')">Account</button>
+          <button class="px-3 py-1.5 text-xs rounded-lg"
+            [class]="category()==='other' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600 hover:text-gray-900'"
+            (click)="setCategory('other')">Other</button>
+        </div>
+      </div>
+
+      <!-- Confidence -->
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-gray-500">Confidence</span>
+        <select
+          class="rounded-xl border border-gray-200 px-3 py-2 text-sm bg-white"
+          [value]="confidence()"
+          (change)="setConfidence(($any($event.target)).value)"
+        >
+          <option value="all">All</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+
+      <!-- Urgent -->
+      <label class="flex items-center gap-2 text-sm text-gray-700">
+        <input
+          type="checkbox"
+          class="h-4 w-4"
+          [checked]="urgentOnly()"
+          (change)="urgentOnly.set(($any($event.target)).checked)"
+        />
+        Urgent only
+      </label>
+
+      <!-- Sort -->
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-gray-500">Sort</span>
+        <select
+          class="rounded-xl border border-gray-200 px-3 py-2 text-sm bg-white"
+          [value]="sort()"
+          (change)="sort.set(($any($event.target)).value)"
+        >
+          <option value="lastSeen_desc">Last seen (new)</option>
+          <option value="lastSeen_asc">Last seen (old)</option>
+          <option value="name_asc">Name (A→Z)</option>
+          <option value="name_desc">Name (Z→A)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- List -->
+  <div class="grid gap-3">
+    <a
+      *ngFor="let s of filtered()"
+      [routerLink]="['/sources', s.id]"
+      class="group rounded-2xl border border-gray-200 bg-white p-4 hover:border-gray-300 hover:shadow-sm transition"
+    >
+      <div class="flex items-start gap-4">
+        <!-- Placeholder for processing avatar -->
+        <div class="h-10 w-10 rounded-xl bg-gray-100 border border-gray-200"></div>
+
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2">
+            <div class="truncate text-sm font-semibold text-gray-900">
+              {{ s.displayName }}
+            </div>
+            <div class="text-xs text-gray-500 truncate">({{ s.domain }})</div>
+
+            <span *ngIf="s.isUrgent" class="ml-2 text-[10px] px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-100">
+              Urgent
+            </span>
+          </div>
+
+          <div class="mt-1 text-xs text-gray-600 truncate">
+            {{ s.senderEmail }}
+          </div>
+
+          <div class="mt-3 flex flex-wrap items-center gap-2">
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-gray-50 text-gray-700 border border-gray-200">
+              {{ badgeForCategory(s.category) }}
+            </span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-gray-50 text-gray-700 border border-gray-200">
+              {{ badgeForConfidence(s.confidence) }}
+            </span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-gray-50 text-gray-700 border border-gray-200">
+              Last: {{ s.lastSeen | date:'yyyy/MM/dd' }}
+            </span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-gray-50 text-gray-700 border border-gray-200">
+              {{ s.frequency.count }} / {{ s.frequency.period }}d
+            </span>
+          </div>
+        </div>
+
+        <div class="text-xs text-gray-400 group-hover:text-gray-600 mt-1">
+          Open →
+        </div>
+      </div>
+    </a>
+
+    <!-- Empty state -->
+    <div *ngIf="filtered().length === 0" class="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center">
+      <div class="text-sm font-medium text-gray-900">No sources found</div>
+      <div class="mt-1 text-sm text-gray-600">条件を変えて再検索してください。</div>
+      <button class="mt-4 rounded-xl border border-gray-200 px-4 py-2 text-sm hover:bg-gray-50" (click)="clearFilters()">
+        Reset filters
+      </button>
+    </div>
+  </div>
 </div>

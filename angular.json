@@ -3,7 +3,10 @@
   "version": 1,
   "cli": {
     "packageManager": "npm",
-    "analytics": "956d8727-8ea5-4dea-ab2d-f62aee9f3778"
+    "analytics": "956d8727-8ea5-4dea-ab2d-f62aee9f3778",
+    "cache": {
+      "enabled": false
+    }
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -73,7 +76,10 @@
               "buildTarget": "gmail-registry:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {
+            "prebundle": false
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test"
