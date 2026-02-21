@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
   selector: 'app-header',
   standalone: true,
   imports: [MatToolbarModule, MatButtonModule],
-  templateUrl: './header.html',
+  templateUrl: './header.component.html',
 })
 export class HeaderComponent {
   email = 'user@example.com'; // 後でAccount APIから差し替え
