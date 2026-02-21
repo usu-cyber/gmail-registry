@@ -97,7 +97,7 @@
   <!-- List -->
   <div class="grid gap-3">
     <a
-      *ngFor="let s of filtered()"
+      *ngFor="let s of sourcesList$()"
       [routerLink]="['/sources', s.id]"
       class="group rounded-2xl border border-gray-200 bg-white p-4 hover:border-gray-300 hover:shadow-sm transition"
     >
@@ -144,7 +144,7 @@
     </a>
 
     <!-- Empty state -->
-    <div *ngIf="filtered().length === 0" class="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center">
+    <div *ngIf="sourcesList$().length === 0" class="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center">
       <div class="text-sm font-medium text-gray-900">No sources found</div>
       <div class="mt-1 text-sm text-gray-600">条件を変えて再検索してください。</div>
       <button class="mt-4 rounded-xl border border-gray-200 px-4 py-2 text-sm hover:bg-gray-50" (click)="clearFilters()">

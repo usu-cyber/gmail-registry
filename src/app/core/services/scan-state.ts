@@ -1,47 +1,48 @@
-import { Injectable, computed, signal } from '@angular/core';
-import { Account } from '../models';
-import { MOCK_ACCOUNT } from '../mock-data';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { AccountStateService } from './account-state';
 
 @Injectable({ providedIn: 'root' })
 export class ScanStateService {
-  // まずはモックを初期値に（後で Account API に置換）
-  private accountSig = signal<Account>({ ...MOCK_ACCOUNT });
+  private accountState = inject(AccountStateService);
 
-  account = computed(() => this.accountSig());
-  isConnected = computed(() => this.accountSig().status === 'connected');
-  isScanning = computed(() => !!this.accountSig().isScanning);
-  progress = computed(() => this.accountSig().scanProgress ?? 0);
+  private scanning = signal(false);
+  private progressSig = signal(0);
 
-  setPeriod(period: Account['scanSettings']['period']) {
-    const a = this.accountSig();
-    this.accountSig.set({ ...a, scanSettings: { ...a.scanSettings, period } });
+  account = computed(() => this.accountState.account());
+  isConnected = computed(() => this.accountState.isConnected());
+  isScanning = computed(() => this.scanning());
+  progress = computed(() => this.progressSig());
+
+  setPeriod(period: '7d' | '30d' | '90d' | '1y') {
+    this.accountState.setPeriod(period);
   }
 
   connect() {
-    const a = this.accountSig();
-    this.accountSig.set({ ...a, status: 'connected' });
+    this.accountState.connect();
   }
 
-  // モックのスキャン（後で POST /scan → status に置換）:contentReference[oaicite:1]{index=1}
+  // モックScan（後で API: POST /scan → GET /scan/status に差し替え）:contentReference[oaicite:0]{index=0}
   startScan() {
-    const a = this.accountSig();
-    if (a.isScanning) return;
-    if (a.status !== 'connected') return;
+    if (!this.isConnected() || this.isScanning()) return;
 
-    this.accountSig.set({ ...a, isScanning: true, scanProgress: 0 });
+    this.scanning.set(true);
+    this.progressSig.set(0);
 
     const timer = setInterval(() => {
-      const cur = this.accountSig();
-      const next = Math.min(100, (cur.scanProgress ?? 0) + 12);
-      this.accountSig.set({ ...cur, scanProgress: next });
+      const next = Math.min(100, this.progressSig() + 12);
+      this.progressSig.set(next);
 
       if (next >= 100) {
         clearInterval(timer);
-        const done = this.accountSig();
-        this.accountSig.set({
-          ...done,
-          isScanning: false,
-          lastScanned: new Date(),
+        this.scanning.set(false);
+
+        // 本番では Scan完了時に account.lastScanned を更新（APIから取得）
+        // モックでは AccountState を直接更新
+        const a = this.accountState.account();
+        this.accountState.setAccount({
+          ...a,
+          lastScanned: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         });
       }
     }, 250);
