@@ -8,4 +8,4 @@ import { MatIconModule } from '@angular/material/icon';
   imports: [RouterLink, RouterLinkActive, MatIconModule],
   templateUrl: './sidebar.component.html',
 })
-export class SidebarComponent { }
+export class SidebarComponent {}
