@@ -71,7 +71,7 @@
     <div class="rounded-2xl border border-gray-200 bg-white p-6">
       <div class="text-sm font-semibold text-gray-900">根拠（Evidence）</div>
       <div class="mt-3 grid gap-2">
-        <div *ngFor="let e of s.evidence" class="flex items-start gap-2 rounded-xl bg-gray-50 border border-gray-200 p-3">
+        <div *ngFor="let e of (s.evidence ?? [])" class="flex items-start gap-2 rounded-xl bg-gray-50 border border-gray-200 p-3">
           <span class="mt-0.5 inline-flex h-2 w-2 rounded-full bg-gray-400"></span>
           <div class="text-sm text-gray-700">
             {{ e.description }}
@@ -79,7 +79,7 @@
           </div>
         </div>
 
-        <div *ngIf="s.evidence.length === 0" class="text-sm text-gray-600">
+        <div *ngIf="(s.evidence ?? []).length === 0" class="text-sm text-gray-600">
           まだ根拠がありません。
         </div>
       </div>
@@ -129,7 +129,7 @@
       <div class="text-sm font-semibold text-gray-900">代表メール（Samples）</div>
 
       <div class="mt-4 grid gap-3">
-        <div *ngFor="let m of s.sampleEmails" class="rounded-2xl border border-gray-200 p-4">
+        <div *ngFor="let m of (s.sampleEmails ?? [])" class="rounded-2xl border border-gray-200 p-4">
           <div class="flex items-center justify-between gap-4">
             <div class="text-sm font-medium text-gray-900 truncate">{{ m.subject }}</div>
             <div class="text-xs text-gray-500 whitespace-nowrap">{{ m.date | date:'yyyy/MM/dd' }}</div>
@@ -139,7 +139,7 @@
           </div>
         </div>
 
-        <div *ngIf="s.sampleEmails.length === 0" class="text-sm text-gray-600">
+        <div *ngIf="(s.sampleEmails ?? []).length === 0" class="text-sm text-gray-600">
           サンプルがありません。
         </div>
       </div>
