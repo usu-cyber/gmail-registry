@@ -1,4 +1,4 @@
-import { RegistrationSource } from './models';
+import { RegistrationSource, Account, ScanSummary } from './models';
 
 export const MOCK_SOURCES: RegistrationSource[] = [
   {
@@ -30,3 +30,20 @@ export const MOCK_SOURCES: RegistrationSource[] = [
     sampleEmails: [{ date: new Date('2026-02-13'), subject: 'Weekly update', snippet: '...' }],
   },
 ];
+export const MOCK_ACCOUNT: Account = {
+  id: 'acc_1',
+  email: 'user@example.com',
+  status: 'connected',
+  lastScanned: new Date('2026-02-15T10:00:00Z'),
+  scanSettings: { period: '90d', promotionsOnly: false },
+  isScanning: false,
+  scanProgress: 100,
+};
+
+export const MOCK_SCAN_SUMMARY: ScanSummary = {
+  totalSources: 24,
+  newsletterCount: 8,
+  paymentCount: 12,
+  accountCount: 4,
+  newlyFound: [],
+};

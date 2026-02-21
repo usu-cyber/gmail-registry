@@ -25,6 +25,24 @@ export interface SearchRecipe {
   description?: string;
 }
 
+export type AccountStatus = 'connected' | 'disconnected';
+export type ScanPeriod = '7d' | '30d' | '90d' | '1y';
+
+export interface ScanSettings {
+  period: ScanPeriod;
+  promotionsOnly: boolean;
+}
+
+export interface Account {
+  id: string;
+  email: string;
+  status: AccountStatus;
+  lastScanned?: string | Date;
+  scanSettings: ScanSettings;
+  isScanning?: boolean;
+  scanProgress?: number;
+}
+
 export interface RegistrationSource {
   id: string;
   displayName: string;
@@ -38,4 +56,12 @@ export interface RegistrationSource {
   frequency: SourceFrequency;
   evidence?: SourceEvidence[];
   sampleEmails?: SourceSampleEmail[];
+}
+
+export interface ScanSummary {
+  totalSources: number;
+  newsletterCount: number;
+  paymentCount: number;
+  accountCount: number;
+  newlyFound: RegistrationSource[];
 }

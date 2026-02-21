@@ -1,4 +1,165 @@
-<div class="space-y-2">
-  <h1 class="text-2xl font-semibold text-gray-900">Account</h1>
-  <p class="text-sm text-gray-600">ここに接続状態、スキャン設定、サマリを置く。</p>
+<div class="space-y-6">
+  <!-- Title -->
+  <div>
+    <h1 class="text-2xl font-semibold text-gray-900">Account</h1>
+    <p class="mt-1 text-sm text-gray-600">
+      接続とスキャンの状態。登録先候補へ最短で到達するためのダッシュボード。
+    </p>
+  </div>
+
+  <!-- Account card -->
+  <div class="rounded-2xl border border-gray-200 bg-white p-6">
+    <div class="flex items-start justify-between gap-6">
+      <div class="min-w-0">
+        <div class="text-sm text-gray-500">Gmail</div>
+        <div class="mt-1 text-lg font-semibold text-gray-900 truncate">
+          {{ account().email }}
+        </div>
+
+        <div class="mt-3 flex flex-wrap gap-2">
+          <span class="text-[10px] px-2 py-0.5 rounded-full border"
+            [class]="isConnected() ? 'bg-green-50 text-green-700 border-green-100' : 'bg-gray-50 text-gray-700 border-gray-200'">
+            {{ isConnected() ? 'Connected' : 'Not connected' }}
+          </span>
+
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-gray-50 text-gray-700 border border-gray-200"
+            *ngIf="account().lastScanned as t">
+            Last scanned: {{ t | date:'yyyy/MM/dd HH:mm' }}
+          </span>
+
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-gray-50 text-gray-700 border border-gray-200">
+            Period: {{ account().scanSettings.period }}
+          </span>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <button
+          *ngIf="!isConnected()"
+          class="rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+          (click)="connect()"
+        >
+          Connect Google
+        </button>
+
+        <button
+          *ngIf="isConnected()"
+          class="rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+          [disabled]="isScanning()"
+          (click)="startScan()"
+        >
+          ⚡ Scan
+        </button>
+
+        <a
+          routerLink="/sources"
+          class="rounded-xl border border-gray-200 px-4 py-2 text-sm hover:bg-gray-50 text-center"
+        >
+          View Sources →
+        </a>
+      </div>
+    </div>
+
+    <!-- Scan settings -->
+    <div class="mt-6 border-t border-gray-200 pt-5">
+      <div class="text-sm font-semibold text-gray-900">Scan settings</div>
+
+      <div class="mt-3 flex flex-wrap items-center gap-2">
+        <span class="text-xs text-gray-500 mr-2">Period</span>
+
+        <button class="px-3 py-1.5 text-xs rounded-xl border"
+          [class]="account().scanSettings.period==='7d' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'"
+          (click)="setPeriod('7d')">7d</button>
+
+        <button class="px-3 py-1.5 text-xs rounded-xl border"
+          [class]="account().scanSettings.period==='30d' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'"
+          (click)="setPeriod('30d')">30d</button>
+
+        <button class="px-3 py-1.5 text-xs rounded-xl border"
+          [class]="account().scanSettings.period==='90d' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'"
+          (click)="setPeriod('90d')">90d</button>
+
+        <button class="px-3 py-1.5 text-xs rounded-xl border"
+          [class]="account().scanSettings.period==='1y' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'"
+          (click)="setPeriod('1y')">1y</button>
+      </div>
+
+      <!-- Progress -->
+      <div *ngIf="isScanning()" class="mt-5">
+        <div class="flex items-center justify-between">
+          <div class="text-sm text-gray-700">Scanning…</div>
+          <div class="text-xs text-gray-500">{{ account().scanProgress ?? 0 }}%</div>
+        </div>
+        <div class="mt-2 h-2 rounded-full bg-gray-100 overflow-hidden border border-gray-200">
+          <div class="h-full bg-gray-900" [style.width.%]="account().scanProgress ?? 0"></div>
+        </div>
+        <div class="mt-2 text-xs text-gray-500">
+          ※ 本番では Scan API (202) → status ポーリングで進捗反映。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="grid gap-3 md:grid-cols-4">
+    <div class="rounded-2xl border border-gray-200 bg-white p-4">
+      <div class="text-xs text-gray-500">Total sources</div>
+      <div class="mt-2 text-2xl font-semibold text-gray-900">{{ summary().totalSources }}</div>
+    </div>
+    <div class="rounded-2xl border border-gray-200 bg-white p-4">
+      <div class="text-xs text-gray-500">Newsletter</div>
+      <div class="mt-2 text-2xl font-semibold text-gray-900">{{ summary().newsletterCount }}</div>
+    </div>
+    <div class="rounded-2xl border border-gray-200 bg-white p-4">
+      <div class="text-xs text-gray-500">Payment</div>
+      <div class="mt-2 text-2xl font-semibold text-gray-900">{{ summary().paymentCount }}</div>
+    </div>
+    <div class="rounded-2xl border border-gray-200 bg-white p-4">
+      <div class="text-xs text-gray-500">Account</div>
+      <div class="mt-2 text-2xl font-semibold text-gray-900">{{ summary().accountCount }}</div>
+    </div>
+  </div>
+
+  <!-- Newly found -->
+  <div class="rounded-2xl border border-gray-200 bg-white p-6">
+    <div class="flex items-center justify-between">
+      <div class="text-sm font-semibold text-gray-900">Newly found</div>
+      <a routerLink="/sources" class="text-sm text-gray-600 hover:text-gray-900 underline">See all</a>
+    </div>
+
+    <div class="mt-4 grid gap-3">
+      <a
+        *ngFor="let s of summary().newlyFound"
+        [routerLink]="['/sources', s.id]"
+        class="group rounded-2xl border border-gray-200 p-4 hover:border-gray-300 hover:shadow-sm transition"
+      >
+        <div class="flex items-start gap-4">
+          <div class="h-10 w-10 rounded-xl bg-gray-100 border border-gray-200"></div>
+
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <div class="truncate text-sm font-semibold text-gray-900">{{ s.displayName }}</div>
+              <div class="text-xs text-gray-500 truncate">({{ s.domain }})</div>
+            </div>
+            <div class="mt-1 text-xs text-gray-600 truncate">{{ s.senderEmail }}</div>
+
+            <div class="mt-3 flex flex-wrap gap-2">
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-gray-50 text-gray-700 border border-gray-200">
+                {{ labelCategory(s.category) }}
+              </span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-gray-50 text-gray-700 border border-gray-200">
+                Last: {{ s.lastSeen | date:'yyyy/MM/dd' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="text-xs text-gray-400 group-hover:text-gray-600 mt-1">Open →</div>
+        </div>
+      </a>
+
+      <div *ngIf="summary().newlyFound.length === 0" class="text-sm text-gray-600">
+        まだ新規候補はありません。
+      </div>
+    </div>
+  </div>
 </div>
