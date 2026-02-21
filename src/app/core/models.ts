@@ -18,6 +18,13 @@ export interface SourceSampleEmail {
   snippet: string;
 }
 
+export interface SearchRecipe {
+  id: string;
+  title: string;
+  query: string;
+  description?: string;
+}
+
 export interface RegistrationSource {
   id: string;
   displayName: string;
