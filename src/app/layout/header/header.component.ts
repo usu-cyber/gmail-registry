@@ -1,13 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
+import { CommonModule } from '@angular/common';
+
+import { ScanStateService } from '../../core/services/scan-state';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [MatToolbarModule, MatButtonModule],
+  imports: [CommonModule, MatToolbarModule, MatButtonModule],
   templateUrl: './header.component.html',
 })
 export class HeaderComponent {
-  email = 'user@example.com'; // 後でAccount APIから差し替え
+  scan = inject(ScanStateService);
 }

@@ -1,10 +1,25 @@
 <mat-toolbar class="h-16 bg-white border-b border-gray-200">
   <div class="w-full flex items-center gap-3">
     <div class="text-sm text-gray-500">Gmail</div>
-    <div class="text-sm font-medium text-gray-900 truncate">{{ email }}</div>
+    <div class="text-sm font-medium text-gray-900 truncate">
+      {{ scan.account().email }}
+    </div>
 
     <span class="flex-1"></span>
 
-    <button mat-stroked-button class="rounded-xl">⚡ Scan</button>
+    <div class="flex items-center gap-2">
+      <div *ngIf="scan.isScanning()" class="text-xs text-gray-500">
+        {{ scan.progress() }}%
+      </div>
+
+      <button
+        mat-stroked-button
+        class="rounded-xl"
+        [disabled]="!scan.isConnected() || scan.isScanning()"
+        (click)="scan.startScan()"
+      >
+        ⚡ Scan
+      </button>
+    </div>
   </div>
 </mat-toolbar>
